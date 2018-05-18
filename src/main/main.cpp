@@ -293,6 +293,7 @@ int main(int argc, char* argv[])
     if (loaded)
     {
         // Load XML Config
+		config.init();
         config.load(FILENAME_CONFIG);
 
         // Load fixed PCM ROM based on config

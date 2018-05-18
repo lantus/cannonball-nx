@@ -48,15 +48,15 @@ bool RenderSurface::init(int src_width, int src_height,
     // --------------------------------------------------------------------------------------------
     // Full Screen Mode
     // --------------------------------------------------------------------------------------------
-    if (video_mode == video_settings_t::MODE_FULL || video_mode == video_settings_t::MODE_STRETCH)
-    {
+ 
 	flags |= (SDL_WINDOW_FULLSCREEN); // Set SDL flag
 
 	// Fullscreen window size: SDL2 ignores w and h in SDL_CreateWindow() if FULLSCREEN flag
 	// is enable, which is fine, so the window will be fullscreen of the physical videomode
 	// size, but then, if we want to preserve ratio, we need dst_width bigger than src_width.	
-	scn_width  = orig_width;
-        scn_height = orig_height;
+	
+	scn_width  = 1280;
+    scn_height = 720;
 
 	src_rect.w = src_width;
 	src_rect.h = src_height;
@@ -64,47 +64,14 @@ bool RenderSurface::init(int src_width, int src_height,
 	src_rect.y = 0;
 	dst_rect.y = 0;
 
-	float x_ratio = float(src_width) / float(src_height);
-	int corrected_scn_width = scn_height * x_ratio; 
-
-	if (!(video_mode == video_settings_t::MODE_STRETCH)) {
-		float x_ratio = float(src_width) / float(src_height);
-		int corrected_scn_width = scn_height * x_ratio; 
-		dst_rect.w = corrected_scn_width;
-		dst_rect.h = scn_height;
-		dst_rect.x = (scn_width - corrected_scn_width) / 2;
-	}
-	else {
-		dst_rect.w = scn_width;
-		dst_rect.h = scn_height;
-		dst_rect.x = 0;
-	}
-
-        SDL_ShowCursor(false);
-     }
-   
-    // --------------------------------------------------------------------------------------------
-    // Windowed Mode
-    // --------------------------------------------------------------------------------------------
-    else
-    {
-        this->video_mode = video_settings_t::MODE_WINDOW;
-       
-        scn_width  = src_width  * scale;
-        scn_height = src_height * scale;
-
-	src_rect.w = src_width;
-	src_rect.h = src_height;
-	src_rect.x = 0;
-	src_rect.y = 0;
-	dst_rect.w = scn_width;
-	dst_rect.h = scn_height;
-	dst_rect.x = 0;
-	dst_rect.y = 0;
-
-        SDL_ShowCursor(true);
-    }
-
+	dst_rect.w = src_width * scale;
+	dst_rect.h = src_height * scale;
+	dst_rect.x = (scn_width - dst_rect.w) / 2;
+	dst_rect.y = (scn_height - dst_rect.h) / 2;
+	
+	
+	SDL_ShowCursor(false);
+	
     //int bpp = info->vfmt->BitsPerPixel;
     const int bpp = 32;
 
@@ -128,11 +95,9 @@ bool RenderSurface::init(int src_width, int src_height,
     }
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear"); 
-    window = SDL_CreateWindow(
-        "Cannonball", 0, 0, scn_width, scn_height, 
-        flags);
+    window = SDL_CreateWindow("CannonBall", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 0, 0, SDL_WINDOW_FULLSCREEN_DESKTOP);
 
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
     texture = SDL_CreateTexture(renderer,
                                SDL_PIXELFORMAT_ARGB8888,
                                SDL_TEXTUREACCESS_STREAMING,

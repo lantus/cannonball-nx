@@ -53,7 +53,7 @@ void Config::init()
     video.scale      = 0;
     video.scanlines  = 0;
     video.fps        = 0;
-    video.fps_count  = 1;
+    video.fps_count  = 0;
     video.widescreen = 0;
     video.hires      = 0;
     video.filtering  = 0;
