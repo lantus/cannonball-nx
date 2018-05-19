@@ -13,6 +13,8 @@
 #include "rendersurface.hpp"
 #include "frontend/config.hpp"
 
+int padding = 0;
+
 RenderSurface::RenderSurface()
 {
 }
@@ -48,15 +50,15 @@ bool RenderSurface::init(int src_width, int src_height,
     // --------------------------------------------------------------------------------------------
     // Full Screen Mode
     // --------------------------------------------------------------------------------------------
- 
+    if (video_mode == video_settings_t::MODE_FULL || video_mode == video_settings_t::MODE_STRETCH)
+    {
 	flags |= (SDL_WINDOW_FULLSCREEN); // Set SDL flag
 
 	// Fullscreen window size: SDL2 ignores w and h in SDL_CreateWindow() if FULLSCREEN flag
 	// is enable, which is fine, so the window will be fullscreen of the physical videomode
 	// size, but then, if we want to preserve ratio, we need dst_width bigger than src_width.	
-	
-	scn_width  = 1280;
-    scn_height = 720;
+	scn_width  = orig_width;
+        scn_height = orig_height;
 
 	src_rect.w = src_width;
 	src_rect.h = src_height;
@@ -64,14 +66,52 @@ bool RenderSurface::init(int src_width, int src_height,
 	src_rect.y = 0;
 	dst_rect.y = 0;
 
-	dst_rect.w = src_width * scale;
-	dst_rect.h = src_height * scale;
-	dst_rect.x = (scn_width - dst_rect.w) / 2;
-	dst_rect.y = (scn_height - dst_rect.h) / 2;
+	float x_ratio = float(src_width) / float(src_height);
+	int corrected_scn_width = scn_height * x_ratio; 
+
+	if (!(video_mode == video_settings_t::MODE_STRETCH)) {
+		float x_ratio = float(src_width) / float(src_height);
+		int corrected_scn_width = scn_height * x_ratio; 
+		dst_rect.w = corrected_scn_width;
+		dst_rect.h = scn_height;
+		dst_rect.x = (scn_width - corrected_scn_width) / 2;
+	}
+	else {
+		dst_rect.w = scn_width;
+		dst_rect.h = scn_height;
+		dst_rect.x = 0;
+	}
+
+        SDL_ShowCursor(false);
+     }
+   
+    // --------------------------------------------------------------------------------------------
+    // Windowed Mode
+    // --------------------------------------------------------------------------------------------
+    else
+    {
+        this->video_mode = video_settings_t::MODE_WINDOW;
+       
+        scn_width  = src_width  * scale;
+        scn_height = src_height * scale;
+
+		src_rect.w = src_width;
+		src_rect.h = src_height;
+		src_rect.x = 0;
+		src_rect.y = 0;
+		dst_rect.w = scn_width;
+		dst_rect.h = scn_height;
+		dst_rect.x = 0;
+		dst_rect.y = 0;
 	
-	
-	SDL_ShowCursor(false);
-	
+	if (src_width % 8 != 0)
+        padding = 8 - (src_width % 8);
+    else
+        padding = 0;
+
+        SDL_ShowCursor(true);
+    }
+
     //int bpp = info->vfmt->BitsPerPixel;
     const int bpp = 32;
 
@@ -80,7 +120,7 @@ bool RenderSurface::init(int src_width, int src_height,
         SDL_FreeSurface(surface);
 
     surface = SDL_CreateRGBSurface(0,
-                                  src_width,
+                                  src_width + padding,
                                   src_height,
                                   bpp,
                                   0,
@@ -95,7 +135,9 @@ bool RenderSurface::init(int src_width, int src_height,
     }
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear"); 
-    window = SDL_CreateWindow("CannonBall", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 0, 0, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    window = SDL_CreateWindow(
+        "Cannonball", 0, 0, scn_width, scn_height, 
+        flags);
 
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
     texture = SDL_CreateTexture(renderer,
@@ -135,7 +177,7 @@ bool RenderSurface::finalize_frame()
     // SDL2 block
     SDL_UpdateTexture(texture, NULL, screen_pixels, src_width * sizeof (Uint32));
     SDL_RenderClear(renderer);
-    SDL_RenderCopy(renderer, texture, &src_rect, &dst_rect);
+    SDL_RenderCopy(renderer, texture, NULL,NULL);
     SDL_RenderPresent(renderer);
     //
 
@@ -146,7 +188,11 @@ void RenderSurface::draw_frame(uint16_t* pixels)
 {
     uint32_t* spix = screen_pixels;
 
-    // Lookup real RGB value from rgb array for backbuffer
-    for (int i = 0; i < (src_width * src_height); i++)
-	*(spix++) = rgb[*(pixels++) & ((S16_PALETTE_ENTRIES * 3) - 1)];
+    for (int i = 0; i < src_height; i++) {
+        for (int j = 0; j < src_width; j++) {
+            *(spix++) = 0xFF << 24 | rgb[*(pixels++) & ((S16_PALETTE_ENTRIES * 3) - 1)] ; 
+        }
+        for (int j = 0; j < padding; j++)
+            spix++;
+    }
 }

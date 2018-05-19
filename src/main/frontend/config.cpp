@@ -49,23 +49,28 @@ void Config::init()
     // Video Settings
     // ------------------------------------------------------------------------
    
-    video.mode       =  video_settings_t::MODE_FULL;
-    video.scale      = 0;
-    video.scanlines  = 0;
-    video.fps        = 0;
-    video.fps_count  = 0;
-    video.widescreen = 0;
-    video.hires      = 0;
-    video.filtering  = 0;
+    //video.mode       =  video_settings_t::MODE_WINDOW;
+    //video.scale      = 0;
+    //video.scanlines  = 0;
+    //video.fps        = 0;
+    //video.fps_count  = 0;
+    //video.widescreen = 1;
+    //video.hires      = 0;
+    //video.filtering  = 0;
           
-    set_fps(video.fps);
+    //set_fps(video.fps);
 
     // ------------------------------------------------------------------------
     // Sound Settings
     // ------------------------------------------------------------------------
+	
+	
+	video.widescreen = 1;
+	
+	
     sound.enabled     = 0;
     sound.advertise   = 0;
-    sound.preview     = 1;
+    sound.preview     = 0;
     sound.fix_samples = 0;
 
     // Custom Music

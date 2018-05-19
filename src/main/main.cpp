@@ -7,6 +7,7 @@
 
 // Error reporting
 #include <iostream>
+#include <switch.h>
 
 // SDL Library
 #include <SDL.h>
@@ -264,7 +265,8 @@ static void main_loop()
 
 int main(int argc, char* argv[])
 {
-    // Initialize timer and video systems
+
+    //	 Initialize timer and video systems
     if( SDL_Init( SDL_INIT_TIMER | SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) == -1 ) 
     { 
         std::cerr << "SDL Initialization Failed: " << SDL_GetError() << std::endl;
