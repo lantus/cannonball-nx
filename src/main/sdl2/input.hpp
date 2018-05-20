@@ -92,6 +92,11 @@ private:
 
     void handle_key(const int, const bool);
     void handle_joy(const uint8_t, const bool);
+	
+	bool dpad_up;
+	bool dpad_down;
+	bool dpad_left;
+	bool dpad_right;
 };
 
 extern Input input;

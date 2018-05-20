@@ -104,10 +104,10 @@ bool RenderSurface::init(int src_width, int src_height,
 		dst_rect.x = 0;
 		dst_rect.y = 0;
 	
-	if (src_width % 8 != 0)
-        padding = 8 - (src_width % 8);
-    else
-        padding = 0;
+	//if (src_width % 8 != 0)
+    //    padding = 8 - (src_width % 8);
+    //else
+    //    padding = 0;
 
         SDL_ShowCursor(true);
     }
@@ -137,7 +137,7 @@ bool RenderSurface::init(int src_width, int src_height,
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear"); 
     window = SDL_CreateWindow(
         "Cannonball", 0, 0, scn_width, scn_height, 
-        flags);
+        SDL_WINDOW_FULLSCREEN);
 
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
     texture = SDL_CreateTexture(renderer,
@@ -192,7 +192,7 @@ void RenderSurface::draw_frame(uint16_t* pixels)
         for (int j = 0; j < src_width; j++) {
             *(spix++) = 0xFF << 24 | rgb[*(pixels++) & ((S16_PALETTE_ENTRIES * 3) - 1)] ; 
         }
-        for (int j = 0; j < padding; j++)
-            spix++;
+        //for (int j = 0; j < padding; j++)
+        //    spix++;
     }
 }

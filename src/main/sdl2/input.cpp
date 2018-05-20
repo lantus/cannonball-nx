@@ -40,6 +40,13 @@ void Input::init(int pad_id, int* key_config, int* pad_config, int analog, int* 
     }
 
     a_wheel = CENTRE;
+    
+#ifdef SWITCH
+    dpad_up = false;
+    dpad_down = false;
+    dpad_left = false;
+    dpad_right = false;
+#endif
 }
 
 void Input::close()
@@ -157,8 +164,15 @@ void Input::handle_joy_axis(SDL_JoyAxisEvent* evt)
             // Neural
             if ( (value > -DIGITAL_DEAD ) && (value < DIGITAL_DEAD ) )
             {
+#ifdef SWITCH
+                if (!dpad_left)
+                    keys[LEFT] = false;
+                if (!dpad_right)
+                    keys[RIGHT] = false;
+#else
                 keys[LEFT]  = false;
                 keys[RIGHT] = false;
+#endif
             }
             else if (value < 0)
             {
@@ -175,8 +189,15 @@ void Input::handle_joy_axis(SDL_JoyAxisEvent* evt)
             // Neural
             if ( (value > -DIGITAL_DEAD ) && (value < DIGITAL_DEAD ) )
             {
+#ifdef SWITCH
+                if (!dpad_up)
+                    keys[UP] = false;
+                if (!dpad_down)
+                    keys[DOWN] = false;
+#else
                 keys[UP]  = false;
                 keys[DOWN] = false;
+#endif
             }
             else if (value < 0)
             {
@@ -220,7 +241,11 @@ void Input::handle_joy_axis(SDL_JoyAxisEvent* evt)
             a_wheel = adjusted;
         }
         // Accelerator and Brake [Combined Axis]
+#ifdef SWITCH
+        else if (evt->axis == axis[2])
+#else
         else if (axis[1] == axis[2] && (evt->axis == axis[1] || evt->axis == axis[2]))
+#endif
         {
             // Accelerator
             if (value < -pedals_dead)
@@ -245,6 +270,7 @@ void Input::handle_joy_axis(SDL_JoyAxisEvent* evt)
                 a_brake = 0;
             }
         }
+#ifndef SWITCH
         // Accelerator [Single Axis]
         else if (evt->axis == axis[1])
         {
@@ -261,6 +287,7 @@ void Input::handle_joy_axis(SDL_JoyAxisEvent* evt)
             adjusted += (adjusted >> 2);
             a_brake = adjusted;
         }
+#endif
     }
 }
 
@@ -301,4 +328,26 @@ void Input::handle_joy(const uint8_t button, const bool is_pressed)
 
     if (button == pad_config[7])
         keys[VIEWPOINT] = is_pressed;
+
+#ifdef SWITCH
+    //map dpad to digital directions to allow menu control
+    //even when analog wheel is enabled
+    if (button == 6) {
+        dpad_down = is_pressed;
+        keys[DOWN] = is_pressed;
+    }
+    if (button == 7) {
+        dpad_left = is_pressed;
+        keys[LEFT] = is_pressed;
+    }
+    if (button == 8) {
+        dpad_up = is_pressed;
+        keys[UP] = is_pressed;
+    }
+    if (button == 9) {
+        dpad_right = is_pressed;
+        keys[RIGHT] = is_pressed;
+    }
+#endif
+
 }
