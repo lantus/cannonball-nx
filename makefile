@@ -14,25 +14,56 @@ APP_TITLE := Cannonball
 APP_DESCRIPTION := Cannonball
 APP_AUTHOR := MVG
 APP_VERSION := 1.0.0
+ICON := cannonball.jpg
 
 WINDRES   = windres.exe
 OBJ       = obj/main.o obj/romloader.o obj/roms.o obj/trackloader.o obj/utils.o obj/video.o obj/audio.o obj/input.o obj/renderbase.o obj/rendersurface.o obj/timer.o obj/oanimseq.o obj/oattractai.o obj/obonus.o obj/ocrash.o obj/oferrari.o obj/ohiscore.o obj/ohud.o obj/oinitengine.o obj/oinputs.o obj/olevelobjs.o obj/ologo.o obj/omap.o obj/omusic.o obj/ooutputs.o obj/opalette.o obj/oroad.o obj/osmoke.o obj/osprite.o obj/osprites.o obj/ostats.o obj/otiles.o obj/otraffic.o obj/outils.o obj/outrun.o obj/osound.o obj/osoundint.o obj/segapcm.o obj/soundchip.o obj/ym2151.o obj/hwroad.o obj/hwsprites.o obj/hwtiles.o obj/cabdiag.o obj/config.o obj/menu.o obj/ttrial.o obj/asyncserial.o obj/interface.o obj/ffeedback.o
 LINKOBJ   = obj/main.o obj/romloader.o obj/roms.o obj/trackloader.o obj/utils.o obj/video.o obj/audio.o obj/input.o obj/renderbase.o obj/rendersurface.o obj/timer.o obj/oanimseq.o obj/oattractai.o obj/obonus.o obj/ocrash.o obj/oferrari.o obj/ohiscore.o obj/ohud.o obj/oinitengine.o obj/oinputs.o obj/olevelobjs.o obj/ologo.o obj/omap.o obj/omusic.o obj/ooutputs.o obj/opalette.o obj/oroad.o obj/osmoke.o obj/osprite.o obj/osprites.o obj/ostats.o obj/otiles.o obj/otraffic.o obj/outils.o obj/outrun.o obj/osound.o obj/osoundint.o obj/segapcm.o obj/soundchip.o obj/ym2151.o obj/hwroad.o obj/hwsprites.o obj/hwtiles.o obj/cabdiag.o obj/config.o obj/menu.o obj/ttrial.o obj/asyncserial.o obj/interface.o obj/ffeedback.o
 LIBS      = -specs=$(DEVKITPRO)/libnx/switch.specs -g -march=armv8-a -mtune=cortex-a57 -mtp=soft -fPIE -L$(DEVKITPRO)/libnx/lib -L$(DEVKITPRO)/portlibs/switch/lib -lSDL2 -lnx
-INCS      = -I$(DEVKITPRO)/portlibs/switch/include/SDL2 -I"src/main"  
-CXXINCS   = -I$(DEVKITPRO)/portlibs/switch/include/SDL2 -I"src/main"
-RCINCS    = --include-dir "C:/DEVELO~1/AMIDEV~1/include"
+INCS      = -I$(DEVKITPRO)/portlibs/switch/include/SDL2 -I"src/main" -I$(DEVKITPRO)/libnx/include -I$(DEVKITPRO)/portlibs/switch/include
+CXXINCS   = -I$(DEVKITPRO)/portlibs/switch/include/SDL2 -I"src/main" -I$(DEVKITPRO)/libnx/include -I$(DEVKITPRO)/portlibs/switch/include
 BIN       = release/cannonball.elf
 BUILD	  =	build
 BINDIR	  = release
 DEFINES   =  -DSWITCH -DSDL2
-CXXFLAGS  = $(CXXINCS) $(DEFINES) -march=armv8-a -mtune=cortex-a57 -mtp=soft -fPIE -O2
-CFLAGS    = $(INCS) $(DEFINES)   --march=armv8-a -mtune=cortex-a57 -mtp=soft -fPIE -O2
+CXXFLAGS  = $(CXXINCS) $(DEFINES) -march=armv8-a -mtune=cortex-a57 -mtp=soft -fPIE -O3
+CFLAGS    = $(INCS) $(DEFINES)    -march=armv8-a -mtune=cortex-a57 -mtp=soft -fPIE -O3
 GPROF     = gprof.exe
 RM        = rm -f
 LINK      = aarch64-none-elf-g++ 
 CPP		  = aarch64-none-elf-g++
 OUTPUT    = cannonball
+
+
+ifeq ($(strip $(ICON)),)
+	icons := $(wildcard *.jpg)
+	ifneq (,$(findstring $(TARGET).jpg,$(icons)))
+		export APP_ICON := $(TOPDIR)/$(TARGET).jpg
+	else
+		ifneq (,$(findstring icon.jpg,$(icons)))
+			export APP_ICON := $(TOPDIR)/icon.jpg
+		endif
+	endif
+else
+	export APP_ICON := $(TOPDIR)/$(ICON)
+endif
+
+ifeq ($(strip $(NO_ICON)),)
+	export NROFLAGS += --icon=$(APP_ICON)
+endif
+
+ifeq ($(strip $(NO_NACP)),)
+	export NROFLAGS += --nacp=$(BINDIR)/$(OUTPUT).nacp
+endif
+
+ifneq ($(APP_TITLEID),)
+	export NACPFLAGS += --titleid=$(APP_TITLEID)
+endif
+
+ifneq ($(ROMFS),)
+	export NROFLAGS += --romfsdir=$(CURDIR)/$(ROMFS)
+endif
+
 
 .PHONY: all all-before all-after clean clean-custom
 all: all-before $(BIN) all-after
@@ -43,7 +74,7 @@ clean: clean-custom
 $(BIN): $(OBJ)
 	$(LINK) $(LINKOBJ) -o "release\cannonball.elf" $(LIBS)
 
-obj/main.o: $(GLOBALDEPS) src/main/main.cpp src/main/stdint.hpp src/main/sdl2/timer.hpp src/main/sdl2/input.hpp src/main/sdl/timer.hpp src/main/sdl/input.hpp src/main/video.hpp src/main/stdint.hpp src/main/globals.hpp src/main/stdint.hpp src/main/roms.hpp src/main/romloader.hpp src/main/hwvideo/hwtiles.hpp src/main/hwvideo/hwsprites.hpp src/main/hwvideo/hwroad.hpp src/main/romloader.hpp src/main/trackloader.hpp src/main/globals.hpp src/main/main.hpp src/main/globals.hpp src/main/sdl2/audio.hpp src/main/sdl/audio.hpp src/main/setup.hpp src/main/frontend/config.hpp src/main/frontend/menu.hpp src/main/cannonboard/interface.hpp src/main/engine/oinputs.hpp src/main/engine/outrun.hpp src/main/engine/oaddresses.hpp src/main/engine/osprites.hpp src/main/engine/oentry.hpp src/main/engine/osprite.hpp src/main/engine/outrun.hpp src/main/engine/ooutputs.hpp src/main/directx/ffeedback.hpp src/main/engine/audio/osoundint.hpp src/main/engine/audio/osound.hpp
+obj/main.o: $(GLOBALDEPS) src/main/main.cpp src/main/stdint.hpp src/main/sdl2/timer.hpp src/main/sdl2/input.hpp src/main/sdl2/timer.hpp src/main/sdl2/input.hpp src/main/video.hpp src/main/stdint.hpp src/main/globals.hpp src/main/stdint.hpp src/main/roms.hpp src/main/romloader.hpp src/main/hwvideo/hwtiles.hpp src/main/hwvideo/hwsprites.hpp src/main/hwvideo/hwroad.hpp src/main/romloader.hpp src/main/trackloader.hpp src/main/globals.hpp src/main/main.hpp src/main/globals.hpp src/main/sdl2/audio.hpp src/main/sdl2/audio.hpp src/main/setup.hpp src/main/frontend/config.hpp src/main/frontend/menu.hpp src/main/cannonboard/interface.hpp src/main/engine/oinputs.hpp src/main/engine/outrun.hpp src/main/engine/oaddresses.hpp src/main/engine/osprites.hpp src/main/engine/oentry.hpp src/main/engine/osprite.hpp src/main/engine/outrun.hpp src/main/engine/ooutputs.hpp src/main/directx/ffeedback.hpp src/main/engine/audio/osoundint.hpp src/main/engine/audio/osound.hpp
 	$(CPP) -c src/main/main.cpp -o obj/main.o $(CXXFLAGS)
 
 obj/romloader.o: $(GLOBALDEPS) src/main/romloader.cpp src/main/stdint.hpp src/main/romloader.hpp
@@ -58,7 +89,7 @@ obj/trackloader.o: $(GLOBALDEPS) src/main/trackloader.cpp src/main/trackloader.h
 obj/utils.o: $(GLOBALDEPS) src/main/utils.cpp src/main/utils.hpp src/main/stdint.hpp
 	$(CPP) -c src/main/utils.cpp -o obj/utils.o $(CXXFLAGS)
 
-obj/video.o: $(GLOBALDEPS) src/main/video.cpp src/main/video.hpp src/main/stdint.hpp src/main/globals.hpp src/main/stdint.hpp src/main/roms.hpp src/main/romloader.hpp src/main/hwvideo/hwtiles.hpp src/main/hwvideo/hwsprites.hpp src/main/hwvideo/hwroad.hpp src/main/setup.hpp src/main/globals.hpp src/main/frontend/config.hpp src/main/engine/oinitengine.hpp src/main/engine/outrun.hpp src/main/engine/oaddresses.hpp src/main/engine/osprites.hpp src/main/engine/oentry.hpp src/main/engine/osprite.hpp src/main/engine/outrun.hpp src/main/sdl2/rendergl.hpp src/main/sdl2/renderbase.hpp src/main/stdint.hpp src/main/globals.hpp src/main/setup.hpp src/main/sdl/rendergl.hpp src/main/sdl/renderbase.hpp src/main/stdint.hpp src/main/globals.hpp src/main/setup.hpp src/main/sdl2/rendergles.hpp src/main/sdl2/renderbase.hpp src/main/sdl2/rendersurface.hpp src/main/sdl2/renderbase.hpp src/main/sdl/rendersw.hpp src/main/sdl/renderbase.hpp
+obj/video.o: $(GLOBALDEPS) src/main/video.cpp src/main/video.hpp src/main/stdint.hpp src/main/globals.hpp src/main/stdint.hpp src/main/roms.hpp src/main/romloader.hpp src/main/hwvideo/hwtiles.hpp src/main/hwvideo/hwsprites.hpp src/main/hwvideo/hwroad.hpp src/main/setup.hpp src/main/globals.hpp src/main/frontend/config.hpp src/main/engine/oinitengine.hpp src/main/engine/outrun.hpp src/main/engine/oaddresses.hpp src/main/engine/osprites.hpp src/main/engine/oentry.hpp src/main/engine/osprite.hpp src/main/engine/outrun.hpp src/main/sdl2/rendergl.hpp src/main/sdl2/renderbase.hpp src/main/stdint.hpp src/main/globals.hpp src/main/setup.hpp src/main/sdl2/renderbase.hpp src/main/stdint.hpp src/main/globals.hpp src/main/setup.hpp src/main/sdl2/rendergles.hpp src/main/sdl2/renderbase.hpp src/main/sdl2/rendersurface.hpp src/main/sdl2/renderbase.hpp src/main/sdl/renderbase.hpp
 	$(CPP) -c src/main/video.cpp -o obj/video.o $(CXXFLAGS)
 
 obj/audio.o: $(GLOBALDEPS) src/main/sdl/audio.cpp
@@ -74,7 +105,7 @@ obj/rendersurface.o: $(GLOBALDEPS) src/main/sdl2/rendersurface.cpp
 	$(CPP) -c src/main/sdl2/rendersurface.cpp  -o obj/rendersurface.o $(CXXFLAGS)
 
 obj/timer.o: $(GLOBALDEPS) src/main/sdl2/timer.cpp
-	$(CPP) -c src/main/sdl/timer.cpp -o obj/timer.o $(CXXFLAGS)
+	$(CPP) -c src/main/sdl2/timer.cpp -o obj/timer.o $(CXXFLAGS)
 
 obj/oanimseq.o: $(GLOBALDEPS) src/main/engine/oanimseq.cpp
 	$(CPP) -c src/main/engine/oanimseq.cpp -o obj/oanimseq.o $(CXXFLAGS)

@@ -55,28 +55,27 @@ void Config::init()
     //video.fps        = 0;
     //video.fps_count  = 0;
     //video.widescreen = 1;
-    //video.hires      = 0;
+    //video.hires      = 1;
     //video.filtering  = 0;
-          
-    //set_fps(video.fps);
+
+	video.fps_count  = 0;
+	video.fps = 0;			
+    set_fps(video.fps);
+ 
+	video.widescreen = 1;	
 
     // ------------------------------------------------------------------------
     // Sound Settings
     // ------------------------------------------------------------------------
 	
-	
-	video.widescreen = 1;
-	
-	
-    sound.enabled     = 0;
+    sound.enabled     = 1;
     sound.advertise   = 0;
     sound.preview     = 0;
-    sound.fix_samples = 0;
+    sound.fix_samples = 1;
 
     // Custom Music
     for (int i = 0; i < 4; i++)
-    {
-        
+    {        
       
         sound.custom_music[i].enabled = 0;
         
@@ -97,8 +96,8 @@ void Config::init()
     controls.keyconfig[9]  = 53;
     controls.keyconfig[10] = 286;
     controls.keyconfig[11] = 304;
-    controls.padconfig[0]  = 0;
-    controls.padconfig[1]  = 1;
+    controls.padconfig[0]  = 9;
+    controls.padconfig[1]  = 8;
     controls.padconfig[2]  = 2;
     controls.padconfig[3]  = 2;
     controls.padconfig[4]  = 3;
