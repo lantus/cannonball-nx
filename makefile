@@ -72,7 +72,7 @@ clean: clean-custom
 	$(RM) $(OBJ) $(BIN)
 
 $(BIN): $(OBJ)
-	$(LINK) $(LINKOBJ) -o "release\cannonball.elf" $(LIBS)
+	$(LINK) $(LINKOBJ) -o "release/cannonball.elf" $(LIBS)
 
 obj/main.o: $(GLOBALDEPS) src/main/main.cpp src/main/stdint.hpp src/main/sdl2/timer.hpp src/main/sdl2/input.hpp src/main/sdl2/timer.hpp src/main/sdl2/input.hpp src/main/video.hpp src/main/stdint.hpp src/main/globals.hpp src/main/stdint.hpp src/main/roms.hpp src/main/romloader.hpp src/main/hwvideo/hwtiles.hpp src/main/hwvideo/hwsprites.hpp src/main/hwvideo/hwroad.hpp src/main/romloader.hpp src/main/trackloader.hpp src/main/globals.hpp src/main/main.hpp src/main/globals.hpp src/main/sdl2/audio.hpp src/main/sdl2/audio.hpp src/main/setup.hpp src/main/frontend/config.hpp src/main/frontend/menu.hpp src/main/cannonboard/interface.hpp src/main/engine/oinputs.hpp src/main/engine/outrun.hpp src/main/engine/oaddresses.hpp src/main/engine/osprites.hpp src/main/engine/oentry.hpp src/main/engine/osprite.hpp src/main/engine/outrun.hpp src/main/engine/ooutputs.hpp src/main/directx/ffeedback.hpp src/main/engine/audio/osoundint.hpp src/main/engine/audio/osound.hpp
 	$(CPP) -c src/main/main.cpp -o obj/main.o $(CXXFLAGS)
